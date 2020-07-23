@@ -24,6 +24,14 @@ Resources:
       Environment:
         Variables:
           TEST: test
+      Events:
+        # この設定だけでAPIgetewayが自動生成される
+        Api:
+            Type: Api
+            Properties:
+                Path: /sample
+                Method: get
+
 Outputs:
   LambdaSampleFunction:
     Description: "First Lambda Function ARN"
