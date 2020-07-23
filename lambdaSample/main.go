@@ -9,7 +9,7 @@ import (
 
 func handler() {
 
-	fmt.Println("morigami")
+	fmt.Println(os.Getenv("TEST"))
 	os.Exit(0)
 }
 
