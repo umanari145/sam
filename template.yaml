@@ -31,8 +31,24 @@ Resources:
             Properties:
                 Path: /sample
                 Method: get
+  # リソース名
+  TriggerBySNSFunction:
+    # リソース種別(Lambdaはこの書き方)
+    Type: AWS::Serverless::Function
+    Properties:
+      # 成果物のパス(ディレクトリまで)
+      CodeUri: "./triggerSNS/"
+      # ハンドラー
+      Handler: main
+      # Runtime
+      Runtime: go1.x
+      # 環境変数セット
+
 
 Outputs:
+  LambdaSampleFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt LambdaSampleFunction.Arn
   LambdaSampleFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt LambdaSampleFunction.Arn
