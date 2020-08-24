@@ -54,9 +54,11 @@ Function 'LambdaSampleFunction' timed out after 5 seconds
 
 
 ### lambda
+*ソースかえても`make build`しないと結果が変わらない
 ```
 make debug
 ```
+
 - 自動でビルドファイル構築& sam local invoke 
 
 ### apiGetway
