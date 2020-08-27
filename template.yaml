@@ -29,7 +29,7 @@ Resources:
         Api:
             Type: Api
             Properties:
-                Path: /sample
+                Path: /area/{zipCode}
                 Method: get
   # リソース名
   TriggerBySNSFunction:
@@ -44,11 +44,7 @@ Resources:
       Runtime: go1.x
       # 環境変数セット
 
-
 Outputs:
-  LambdaSampleFunction:
-    Description: "First Lambda Function ARN"
-    Value: !GetAtt LambdaSampleFunction.Arn
   LambdaSampleFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt LambdaSampleFunction.Arn
