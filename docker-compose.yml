@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  dynamodb-local:
+    container_name: dynamodb
+    image: amazon/dynamodb-local
+    ports:
+      - "5984:5984"
+    command: "-jar DynamoDBLocal.jar -port 5984 -dbPath ./data -sharedDb"
+    volumes:
+      - "./dynamoDB:/home/dynamodblocal/data" 
