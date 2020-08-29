@@ -1,4 +1,4 @@
-# samを使ったLambda(go言語)+APIGateway
+# samを使ったLambda(go言語)+APIGateway+dynamoDB
 
 ## sam インストール
 
@@ -88,3 +88,13 @@ sam deploy
 #Deply this changeset? yで実際にデプロイ
 ```
 
+## dynamoDB
+
+dockerで仮装環境を構築
+
+GUI
+http://dev-host.local:8001/
+
+
+コマンド実行できる
+http://dev-host.local:8000/shell/

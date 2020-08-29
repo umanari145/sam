@@ -1,11 +1,22 @@
 version: "3"
 
 services:
-  dynamodb-local:
+  dynamodblocal:
     container_name: dynamodb
     image: amazon/dynamodb-local
-    ports:
-      - "5984:5984"
-    command: "-jar DynamoDBLocal.jar -port 5984 -dbPath ./data -sharedDb"
+    command: "-jar DynamoDBLocal.jar -port 8000 -dbPath ./data -sharedDb"
     volumes:
       - "./dynamoDB:/home/dynamodblocal/data" 
+    networks:
+      - default
+    ports:
+      - 8000:8000
+      
+  dynamodbadmin:
+    image: instructure/dynamo-local-admin
+    networks:
+      - default
+    ports:
+      - 8001:8001
+    environment:
+      DYNAMO_ENDPOINT: http://dynamodblocal:8000/
