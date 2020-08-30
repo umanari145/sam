@@ -1,0 +1,42 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./lambdaSample
+      dockerfile: Dockerfile
+    volumes:
+      - "./lambdaSample:/go/src/app"
+    tty: true
+    environment:
+      - GOPATH=/go/libs
+      - DB_TYPE=postgres
+      - POSTGRES_DBHOST=db
+      - POSTGRES_DBNAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - area
+      
+  db:
+    container_name: "db"
+    image: postgres:11        
+    ports:
+     - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - "./db:/docker-entrypoint-initdb.d"
+      # 永続化することでコンテナ削除してもOK
+      - "govolumes:/var/lib/postgresql/data"
+    networks:
+      - area
+
+volumes: 
+  govolumes:
+
+networks:
+  area:
+    driver: "bridge"
