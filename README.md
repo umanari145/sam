@@ -96,5 +96,25 @@ GUI
 http://dev-host.local:8001/
 
 
-コマンド実行できる
+コマンド実行できる(あまり使わないかも・・・)
 http://dev-host.local:8000/shell/
+
+テーブル確認
+```
+aws dynamodb \
+list-tables \
+--endpoint-url http://localhost:8000 
+```
+
+テーブル作成
+
+```
+aws dynamodb \
+create-table \
+--endpoint-url http://localhost:8000 \
+--cli-input-json file://dynamoDB/script/area.json
+
+#--cli-input-json ファイルパスを表示　dynamoDB/script/area.json
+```
+
+

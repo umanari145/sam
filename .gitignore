@@ -1,4 +1,7 @@
 /lambdaSample/main.zip
 /lambdaSample/main
 .aws-sam/
-/dynamoDB
+/dynamoDB/data/*.db
+/dynamoDB/script/__pycache__
+/dynamoDB/script/.cache
+/dynamoDB/script/.bash_history
