@@ -117,4 +117,34 @@ create-table \
 #--cli-input-json ファイルパスを表示　dynamoDB/script/area.json
 ```
 
+#全件取得
+```
+aws dynamodb scan \
+--endpoint-url http://localhost:8000 \
+--table-name テーブル名
+```
 
+#特定キーで取得
+```
+aws dynamodb get-item \
+--endpoint-url http://localhost:8000 \
+--table-name テーブル名 \
+--key '{"ID":{"N":"1"}}'
+```
+
+#保存
+```
+aws dynamodb put-item \
+    --endpoint-url http://localhost:8000 \
+    --table-name テーブル名 \
+    --item '{
+        "product_id": {"N": "3"},
+        "product_name": {"S": "本"} ,
+        "price_min": {"N": "111"},
+        "price_max": {"N": "222"}
+      }'
+```
+
+boto3
+
+https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
