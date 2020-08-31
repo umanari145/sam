@@ -32,26 +32,23 @@ type Area struct {
 }
 
 //loadAreaFromZip は地域を郵便番号をみる
-func loadAreaFromZip(zipCode string) Area {
+func loadAreaFromZip(zipCode string) (Area, error) {
 	dbConn, err := Connect()
 
 	if err != nil {
-		log.Printf("loadAreaFromZip Cannnot Connect DB %s", err.Error())
-		return Area{}
+		return Area{}, fmt.Errorf("loadAreaFromZip Cannnot Connect DB %s", err.Error())
 	}
 	defer dbConn.Close()
 
 	area := Area{}
 
 	if zipCode == "" {
-		log.Println("loadAreaFromZip ZipCode is not exist")
-		return Area{}
+		return Area{}, fmt.Errorf("loadAreaFromZip ZipCode is not exist")
 	}
 
 	dbConn.Table("area").Where("zip = ?", zipCode).First(&area)
 
-	return area
-
+	return area, nil
 }
 
 //Connect はDBへの接続
@@ -81,12 +78,28 @@ func Connect() (*gorm.DB, error) {
 	return db, nil
 }
 
-//urlのパターンは　/area/274-0077(郵便番号)
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (string, error) {
-	zipCode := request.PathParameters["zipCode"]
-	loadAreaFromZip(zipCode)
+//MyResponse はレスポンス
+type MyResponse struct {
+	//HTTPStatusCode はHTTPステータスコード
+	HTTPStatusCode int
+	//Body は任意のレスポンス
+	Body interface{}
+}
 
-	return "", nil
+//urlのパターンは　/area/274-0077(郵便番号)
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
+	zipCode := request.PathParameters["zipCode"]
+	area, error := loadAreaFromZip(zipCode)
+
+	var response MyResponse
+	if error != nil {
+		response.HTTPStatusCode = 400
+		response.Body = "郵便番号が存在しません。"
+		return response, error
+	}
+
+	response.Body = area
+	return response, nil
 }
 
 func main() {

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestHandler(t *testing.T) {
-	loadAreaFromZip("2740077")
+	area := loadAreaFromZip("27400773")
+	fmt.Println(area)
 }

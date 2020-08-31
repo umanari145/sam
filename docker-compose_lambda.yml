@@ -12,7 +12,7 @@ services:
       - DB_TYPE=postgres
       - POSTGRES_DBHOST=db
       - POSTGRES_DBNAME=postgres
-      - POSTGRES_USER=postgres
+      - POSTGRES_DBUSER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - "8080:8080"
