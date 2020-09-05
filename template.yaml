@@ -23,11 +23,11 @@ Resources:
       # 環境変数セット
       Environment:
         Variables:
-          DB_TYPE: 
-          POSTGRES_DBHOST: 
-          POSTGRES_DBNAME: 
-          POSTGRES_DBUSER: 
-          POSTGRES_PASSWORD: 
+          DB_TYPE: DB_TYPE
+          POSTGRES_DBHOST: DB_HOST
+          POSTGRES_DBNAME: DB_NAME
+          POSTGRES_DBUSER: DB_USER
+          POSTGRES_PASSWORD: DB_PASSWORD
       Events:
         # この設定だけでAPIgetewayが自動生成される
         Api:

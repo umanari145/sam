@@ -98,7 +98,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	}
 
 	if error != nil {
-		log.Println("Invalid argument error occur ")
+		log.Printf("Invalid argument error occur %s", error)
 		response.StatusCode = 400
 		return response, error
 	}
@@ -107,7 +107,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	body, error := json.Marshal(area)
 
 	if error != nil {
-		log.Println("JSON parse error ")
+		log.Println("JSON parse error %s", error)
 		response.StatusCode = 500
 		return response, error
 	}

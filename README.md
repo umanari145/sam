@@ -18,6 +18,7 @@ sam --version
     - main.go エントリーポイント
     - main_test.go テストファイル
 - event_api.json apigatewayのリクエストのサンプルファイル
+- lambda_env_vars.json.dummy 環境変数のサンプル
 - Makefile ビルドやデバッグなどのファイル
 - template.yaml samのサンプルファイル
 
@@ -65,7 +66,7 @@ make debug
 ビルド&ローカルAPI
 ```
 make build
-sam local start-api
+sam local start-api (--env-vars vars.json:環境変数を外部)
 
 Mounting LambdaSampleFunction at http://127.0.0.1:3000/sample [GET]
 You can now browse to the above endpoints to invoke your functions. You do not need to restart/reload SAM CLI while working on your functions, changes will be reflected instantly/automatically. You only need to restart SAM CLI if you update your AWS SAM template

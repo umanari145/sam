@@ -5,3 +5,4 @@
 /dynamoDB/script/__pycache__
 /dynamoDB/script/.cache
 /dynamoDB/script/.bash_history
+lambda_env_vars.json
