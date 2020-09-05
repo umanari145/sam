@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -48,6 +50,10 @@ func loadAreaFromZip(zipCode string) (Area, error) {
 
 	dbConn.Table("area").Where("zip = ?", zipCode).First(&area)
 
+	if area.ID == "" {
+		return Area{}, fmt.Errorf("地域が存在しません。")
+	}
+
 	return area, nil
 }
 
@@ -79,12 +85,7 @@ func Connect() (*gorm.DB, error) {
 }
 
 //MyResponse はレスポンス
-type MyResponse struct {
-	//HTTPStatusCode はHTTPステータスコード
-	HTTPStatusCode int
-	//Body は任意のレスポンス
-	Body interface{}
-}
+type MyResponse events.APIGatewayProxyResponse
 
 //urlのパターンは　/area/274-0077(郵便番号)
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
@@ -92,13 +93,30 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	area, error := loadAreaFromZip(zipCode)
 
 	var response MyResponse
+	response.Headers = map[string]string{
+		"Content-Type": "application/json",
+	}
+
 	if error != nil {
-		response.HTTPStatusCode = 400
-		response.Body = "郵便番号が存在しません。"
+		log.Println("Invalid argument error occur ")
+		response.StatusCode = 400
+		return response, error
+	}
+	var buf bytes.Buffer
+
+	body, error := json.Marshal(area)
+
+	if error != nil {
+		log.Println("JSON parse error ")
+		response.StatusCode = 500
 		return response, error
 	}
 
-	response.Body = area
+	json.HTMLEscape(&buf, body)
+
+	response.StatusCode = 200
+	response.Body = buf.String()
+
 	return response, nil
 }
 

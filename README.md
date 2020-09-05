@@ -150,5 +150,6 @@ boto3
 https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
 ## postgres 
+DBにログインした後、
 CSV→DBへのインサート
 csv \copy area (zip,pref_kana,city_kana,town_kana,pref,city,town) from '/docker-entrypoint-initdb.d/KEN_ALL.CSV' with csv header
