@@ -1,4 +1,4 @@
-# samを使ったLambda(go言語)+APIGateway+dynamoDB
+# samを使ったLambda(go言語)+APIGateway+dynamoDB(←結局使わず・・)
 
 ## sam インストール
 
@@ -61,6 +61,8 @@ make debug
 ```
 
 - 自動でビルドファイル構築& sam local invoke 
+
+連携の時はapigatewayから呼ぶのと、単独だとテストの方が使えるため、あまり意味がないかも・・・・
 
 ### apiGetway
 ビルド&ローカルAPI
@@ -150,7 +152,7 @@ boto3
 
 https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 
-## postgres 
+## postgres メモ
 DBにログインした後、
 CSV→DBへのインサート
 csv \copy area (zip,pref_kana,city_kana,town_kana,pref,city,town) from '/docker-entrypoint-initdb.d/KEN_ALL.CSV' with csv header
