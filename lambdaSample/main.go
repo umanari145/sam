@@ -17,8 +17,8 @@ import (
 
 //Area は地域
 type Area struct {
-	//ID はプライマリーキー
-	ID string
+	//zip は郵便番号
+	Zip string
 	//Pref は県
 	Pref string
 	//City は市
@@ -50,7 +50,7 @@ func loadAreaFromZip(zipCode string) (Area, error) {
 
 	dbConn.Table("area").Where("zip = ?", zipCode).First(&area)
 
-	if area.ID == "" {
+	if area.Zip == "" {
 		return Area{}, fmt.Errorf("地域が存在しません。")
 	}
 
@@ -107,7 +107,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	body, error := json.Marshal(area)
 
 	if error != nil {
-		log.Println("JSON parse error %s", error)
+		log.Printf("JSON parse error %s", error)
 		response.StatusCode = 500
 		return response, error
 	}

@@ -65,7 +65,8 @@ make debug
 連携の時はapigatewayから呼ぶのと、単独だとテストの方が使えるため、あまり意味がないかも・・・・
 
 ### apiGetway
-ビルド&ローカルAPI
+ビルド&ローカルAPI<br>
+#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。
 ```
 make build
 sam local start-api (--env-vars vars.json:環境変数を外部)
@@ -76,17 +77,17 @@ You can now browse to the above endpoints to invoke your functions. You do not n
 
 #別ウィンドウで下記コマンドを叩く
 curl http://127.0.0.1:3000/sample
+#最初のコマンド実行時はbuildはものすごく時間がかかるので要注意
 #その後、api開いた画面でログが出ていればOK
 ```
 
 ## ビルド　&& デプロイ
+#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。
 ```
 make build 
 
 sam deploy --guided
 #全てyesでOK(ここでおそらくdeploy前準備のようなもの)
-#その後、再度
-sam deploy 
 
 #Deply this changeset? yで実際にデプロイ
 ```
@@ -96,11 +97,8 @@ sam deploy
 dockerで仮装環境を構築
 
 GUI
-http://dev-host.local:8001/
+http://localhost:8001/
 
-
-コマンド実行できる(あまり使わないかも・・・)
-http://dev-host.local:8000/shell/
 
 テーブル確認
 ```

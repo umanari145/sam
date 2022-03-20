@@ -6,6 +6,10 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	area := loadAreaFromZip("27400773")
-	fmt.Println(area)
+	area, err := loadAreaFromZip("2740077")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(area)
+	}
 }
