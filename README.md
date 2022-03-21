@@ -80,6 +80,7 @@ curl http://127.0.0.1:3000/sample
 #最初のコマンド実行時はbuildはものすごく時間がかかるので要注意
 #その後、api開いた画面でログが出ていればOK
 ```
+* ローカルAPIの場合認証は入らない
 
 ## ビルド　&& デプロイ
 #下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。非コンテナ内
@@ -91,6 +92,14 @@ sam deploy --guided
 #deploy前準備のようなもの
 #LambdaSampleFunction may not have authorization defined, Is this okay?→y
 #Deply this changeset? yで実際にデプロイ
+```
+
+* apiKeyに関して`AWS::ApiGateway::UsagePlan`や`AWS::ApiGateway::UsagePlanKey`も必要になる(設定が色々面倒)
+
+本番のAPI
+```
+curl  https://xxxxxxxxxxxx.execute-api.us-east-1.amazonaws.com/Prod/area/2740077 \
+ -H 'x-api-key: APIキー'
 ```
 
 ## デプロイ時のパラメータ上書き

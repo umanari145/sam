@@ -21,13 +21,53 @@ Parameters:
     Type: String
 
 Resources:
-  # APIの認証情報
-  ApiKey:
+  # APIの設定
+  SampleRestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
         ApiKeyRequired: true
+
+  # APIキーの設定
+  SampleRestApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: 
+      - SampleRestApi
+      - SampleRestApiProdStage
+    Properties: 
+      Enabled: true
+      Name: !Sub 'api-key'
+      StageKeys: 
+        - RestApiId: 
+            Ref: SampleRestApi
+          StageName: Prod
+
+  ApiUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn: 
+      - SampleRestApi
+      - SampleRestApiProdStage
+    Properties:
+      ApiStages:
+          - ApiId: !Ref SampleRestApi
+            Stage: !Ref SampleRestApiProdStage
+          # AWS::Serverless::Api のリソース名 + AWS::Serverless::Api の 'StageName' + Stage 
+      #使用回数の制限      
+      Throttle:
+        BurstLimit: 200
+        RateLimit: 100
+      UsagePlanName: !Sub 'api-plan'
+
+  ApiUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    DependsOn:
+      - ApiUsagePlan
+      - SampleRestApiKey
+    Properties : 
+      KeyId: !Ref SampleRestApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
 
   # リソース名
   LambdaSampleFunction:
@@ -56,7 +96,7 @@ Resources:
                 Path: /area/{zipCode}
                 Method: get
                 # restAPIとの紐付け
-                RestApiId: !Ref ApiKey
+                RestApiId: !Ref SampleRestApi
                 Auth:
                   ApiKeyRequired: true
 
