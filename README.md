@@ -37,7 +37,7 @@ sam local generate-event apigateway aws-proxy > event_api.json
 
 lambdaローカル実行
 ```
-sam local invoke LambdaSampleFunction --event event_api.json
+sam local invoke LambdaSampleFunction --event event_api.json --debug -l sample.log
 
 #実行結果 dockerのイメージをダウンロードして実行しているようで4〜5秒かかる。初回はもっと。
 updating: main (deflated 49%)
@@ -66,10 +66,10 @@ make debug
 
 ### apiGetway
 ビルド&ローカルAPI<br>
-#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。
+#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。非コンテナ内
 ```
 make build
-sam local start-api (--env-vars vars.json:環境変数を外部)
+sam local start-api (--env-vars vars.json:環境変数を外部化)
 
 Mounting LambdaSampleFunction at http://127.0.0.1:3000/sample [GET]
 You can now browse to the above endpoints to invoke your functions. You do not need to restart/reload SAM CLI while working on your functions, changes will be reflected instantly/automatically. You only need to restart SAM CLI if you update your AWS SAM template
@@ -82,16 +82,27 @@ curl http://127.0.0.1:3000/sample
 ```
 
 ## ビルド　&& デプロイ
-#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。
+#下記コマンドは全てルートディレクトリ(README.mdと同じディレクトリ)で。非コンテナ内
 ```
 make build 
+#ここで.aws-samに資材ができる(templateを更新してもbuildしないと上書きされない)
 
 sam deploy --guided
-#全てyesでOK(ここでおそらくdeploy前準備のようなもの)
-
+#deploy前準備のようなもの
+#LambdaSampleFunction may not have authorization defined, Is this okay?→y
 #Deply this changeset? yで実際にデプロイ
 ```
 
+## デプロイ時のパラメータ上書き
+
+```
+sam deploy --guided --parameter-overrides \
+DbType=DBタイプ \
+PostgresDbhost=ポート
+PostgresDbname=DB名 \
+PostgresDbuser=DBユーザー \
+PostgresPassword=DBパスワード
+```
 ## dynamoDB
 
 dockerで仮装環境を構築

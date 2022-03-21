@@ -71,10 +71,9 @@ func Connect() (*gorm.DB, error) {
 		" password=" + PASS +
 		" sslmode=disable"
 
-	fmt.Printf("DB_CONNECT:%s", CONNECT)
+	log.Printf("DB_CONNECT:%s", CONNECT)
 
 	db, err := gorm.Open(DBMS, CONNECT)
-	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +88,10 @@ type MyResponse events.APIGatewayProxyResponse
 
 //urlのパターンは　/area/274-0077(郵便番号)
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
+	log.Print("API start")
 	zipCode := request.PathParameters["zipCode"]
+	log.Printf("zipCode %s", zipCode)
+
 	area, error := loadAreaFromZip(zipCode)
 
 	var response MyResponse

@@ -1,9 +1,9 @@
 {
     "LambdaSampleFunction": {
       "DB_TYPE": "DBタイプ",
-      "DB_HOST": "ホスト情報",
-      "DB_NAME": "DB名",
-      "DB_USER": "DBユーザー",
-      "DB_PASSWORD": "DBパスワード"
+      "POSTGRES_DBHOST": "DBのホスト情報",
+      "POSTGRES_DBNAME": "DB名",
+      "POSTGRES_DBUSER": "DBユーザー",
+      "POSTGRES_PASSWORD": "DBパスワード"
     }
-  }
+}

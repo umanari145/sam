@@ -8,6 +8,18 @@ Globals:
   Function:
     Timeout: 5
 
+Parameters:
+  DbType:
+    Type: String
+  PostgresDbhost:
+    Type: String
+  PostgresDbname:
+    Type: String
+  PostgresDbuser:
+    Type: String
+  PostgresPassword:
+    Type: String
+
 Resources:
   # リソース名
   LambdaSampleFunction:
@@ -23,11 +35,11 @@ Resources:
       # 環境変数セット
       Environment:
         Variables:
-          DB_TYPE: DB_TYPE
-          POSTGRES_DBHOST: DB_HOST
-          POSTGRES_DBNAME: DB_NAME
-          POSTGRES_DBUSER: DB_USER
-          POSTGRES_PASSWORD: DB_PASSWORD
+          DB_TYPE: !Ref DbType
+          POSTGRES_DBHOST: !Ref PostgresDbhost
+          POSTGRES_DBNAME: !Ref PostgresDbname
+          POSTGRES_DBUSER: !Ref PostgresDbuser
+          POSTGRES_PASSWORD: !Ref PostgresPassword
       Events:
         # この設定だけでAPIgetewayが自動生成される
         Api:
@@ -35,6 +47,7 @@ Resources:
             Properties:
                 Path: /area/{zipCode}
                 Method: get
+
   # リソース名
   TriggerBySNSFunction:
     # リソース種別(Lambdaはこの書き方)
