@@ -21,6 +21,14 @@ Parameters:
     Type: String
 
 Resources:
+  # APIの認証情報
+  ApiKey:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+
   # リソース名
   LambdaSampleFunction:
     # リソース種別(Lambdaはこの書き方)
@@ -47,6 +55,10 @@ Resources:
             Properties:
                 Path: /area/{zipCode}
                 Method: get
+                # restAPIとの紐付け
+                RestApiId: !Ref ApiKey
+                Auth:
+                  ApiKeyRequired: true
 
   # リソース名
   TriggerBySNSFunction:
