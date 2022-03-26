@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,40 +19,41 @@ import (
 //Area は地域
 type Area struct {
 	//zip は郵便番号
-	Zip string
+	Zip string `json:"zip"`
 	//Pref は県
-	Pref string
+	Pref string `json:"pref"`
 	//City は市
-	City string
+	City string `json:"city"`
 	//Town は町村
-	Town string
+	Town string `json:"town"`
 	//PrefKana は県のカナ
-	PrefKana string
+	PrefKana string `json:"pref_kana"`
 	//CityKana は市のカナ
-	CityKana string
+	CityKana string `json:"city_kana"`
 	//TownKana は町村のカナ
-	TownKana string
+	TownKana string `json:"town_kana"`
+}
+
+func validCheck(zipCode string) error {
+
+	if zipCode == "" {
+		return fmt.Errorf("郵便番号が未入力です。")
+	}
+
+	regex := regexp.MustCompile(`^[0-9]{7}$`)
+	if !regex.MatchString(zipCode) {
+		return fmt.Errorf("半角数字7桁で入力してください。")
+	}
+
+	return nil
 }
 
 //loadAreaFromZip は地域を郵便番号をみる
-func loadAreaFromZip(zipCode string) (Area, error) {
-	dbConn, err := Connect()
-
-	if err != nil {
-		return Area{}, fmt.Errorf("loadAreaFromZip Cannnot Connect DB %s", err.Error())
-	}
-	defer dbConn.Close()
+func loadAreaFromZip(dbConn *gorm.DB, zipCode string) (Area, error) {
 
 	area := Area{}
-
-	if zipCode == "" {
-		return Area{}, fmt.Errorf("loadAreaFromZip ZipCode is not exist")
-	}
-
-	dbConn.Table("area").Where("zip = ?", zipCode).First(&area)
-
-	if area.Zip == "" {
-		return Area{}, fmt.Errorf("地域が存在しません。")
+	if err := dbConn.Table("area").Where("zip = ?", zipCode).First(&area).Error; err != nil {
+		return Area{}, fmt.Errorf("SQLの実行に失敗しました。 %w", err)
 	}
 
 	return area, nil
@@ -77,8 +79,9 @@ func Connect() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	db.LogMode(true)
-	log.Print("DB connect")
+	log.Print("DBに接続しました。")
 
 	return db, nil
 }
@@ -87,31 +90,59 @@ func Connect() (*gorm.DB, error) {
 type MyResponse events.APIGatewayProxyResponse
 
 //urlのパターンは　/area/274-0077(郵便番号)
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
-	log.Print("API start")
-	zipCode := request.PathParameters["zipCode"]
-	log.Printf("zipCode %s", zipCode)
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyResponse {
 
-	area, error := loadAreaFromZip(zipCode)
+	zipCode := request.PathParameters["zipCode"]
+	log.Printf("住所検索取得APIを開始します。リクエストパラメーター %s", zipCode)
+
+	err := validCheck(zipCode)
 
 	var response MyResponse
 	response.Headers = map[string]string{
 		"Content-Type": "application/json",
 	}
 
-	if error != nil {
-		log.Printf("Invalid argument error occur %s", error)
+	if err != nil {
+		errorMsg := fmt.Sprintf("入力値に不適切です。メッセージ　%s", err)
+		log.Printf(errorMsg)
 		response.StatusCode = 400
-		return response, error
+		response.Body = errorMsg
+		return response
 	}
-	var buf bytes.Buffer
 
-	body, error := json.Marshal(area)
-
-	if error != nil {
-		log.Printf("JSON parse error %s", error)
+	dbConn, err := Connect()
+	if err != nil {
+		errorMsg := fmt.Sprintf("DB接続時に失敗しました。メッセージ　%s", err)
+		log.Printf(errorMsg)
 		response.StatusCode = 500
-		return response, error
+		response.Body = errorMsg
+		return response
+	}
+	defer dbConn.Close()
+
+	area, err := loadAreaFromZip(dbConn, zipCode)
+	if err != nil {
+		errorMsg := fmt.Sprintf("郵便番号の取得に失敗しました。%s", err)
+		log.Printf(errorMsg)
+		response.StatusCode = 500
+		response.Body = errorMsg
+		return response
+	}
+
+	if area.Zip == "" {
+		msg := fmt.Sprintf("住所が存在しません。")
+		log.Printf(msg)
+	}
+
+	var buf bytes.Buffer
+	body, err := json.Marshal(area)
+
+	if err != nil {
+		errorMsg := fmt.Sprintf("JSONのパースに失敗しました。%s", err)
+		log.Printf(errorMsg)
+		response.StatusCode = 500
+		response.Body = errorMsg
+		return response
 	}
 
 	json.HTMLEscape(&buf, body)
@@ -119,7 +150,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	response.StatusCode = 200
 	response.Body = buf.String()
 
-	return response, nil
+	return response
 }
 
 func main() {
