@@ -90,7 +90,7 @@ func Connect() (*gorm.DB, error) {
 type MyResponse events.APIGatewayProxyResponse
 
 //urlのパターンは　/area/274-0077(郵便番号)
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyResponse {
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
 
 	zipCode := request.PathParameters["zipCode"]
 	log.Printf("住所検索取得APIを開始します。リクエストパラメーター %s", zipCode)
@@ -107,7 +107,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyRespo
 		log.Printf(errorMsg)
 		response.StatusCode = 400
 		response.Body = errorMsg
-		return response
+		return response, err
 	}
 
 	dbConn, err := Connect()
@@ -116,7 +116,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyRespo
 		log.Printf(errorMsg)
 		response.StatusCode = 500
 		response.Body = errorMsg
-		return response
+		return response, err
 	}
 	defer dbConn.Close()
 
@@ -126,7 +126,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyRespo
 		log.Printf(errorMsg)
 		response.StatusCode = 500
 		response.Body = errorMsg
-		return response
+		return response, err
 	}
 
 	if area.Zip == "" {
@@ -142,7 +142,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyRespo
 		log.Printf(errorMsg)
 		response.StatusCode = 500
 		response.Body = errorMsg
-		return response
+		return response, err
 	}
 
 	json.HTMLEscape(&buf, body)
@@ -150,7 +150,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) MyRespo
 	response.StatusCode = 200
 	response.Body = buf.String()
 
-	return response
+	return response, nil
 }
 
 func main() {

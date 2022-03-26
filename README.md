@@ -96,7 +96,7 @@ sam deploy --guided
 
 * apiKeyに関して`AWS::ApiGateway::UsagePlan`や`AWS::ApiGateway::UsagePlanKey`も必要になる(設定が色々面倒)
 
-本番のAPI
+本番のAPI(開発はx-api-keyはなくてもOK)
 ```
 curl  https://xxxxxxxxxxxx.execute-api.us-east-1.amazonaws.com/Prod/area/2740077 \
  -H 'x-api-key: APIキー'
