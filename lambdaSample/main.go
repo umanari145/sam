@@ -86,37 +86,29 @@ func Connect() (*gorm.DB, error) {
 	return db, nil
 }
 
-//MyResponse はレスポンス
-type MyResponse events.APIGatewayProxyResponse
-
 //urlのパターンは　/area/274-0077(郵便番号)
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResponse, error) {
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	zipCode := request.PathParameters["zipCode"]
 	log.Printf("住所検索取得APIを開始します。リクエストパラメーター %s", zipCode)
 
-	err := validCheck(zipCode)
-
-	var response MyResponse
-	response.Headers = map[string]string{
-		"Content-Type": "application/json",
-	}
-
-	if err != nil {
+	if err := validCheck(zipCode); err != nil {
 		errorMsg := fmt.Sprintf("入力値に不適切です。メッセージ　%s", err)
 		log.Printf(errorMsg)
-		response.StatusCode = 400
-		response.Body = errorMsg
-		return response, err
+		return events.APIGatewayProxyResponse{
+			Body:       err.Error(),
+			StatusCode: 400,
+		}, err
 	}
 
 	dbConn, err := Connect()
 	if err != nil {
 		errorMsg := fmt.Sprintf("DB接続時に失敗しました。メッセージ　%s", err)
 		log.Printf(errorMsg)
-		response.StatusCode = 500
-		response.Body = errorMsg
-		return response, err
+		return events.APIGatewayProxyResponse{
+			Body:       err.Error(),
+			StatusCode: 500,
+		}, err
 	}
 	defer dbConn.Close()
 
@@ -124,9 +116,10 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	if err != nil {
 		errorMsg := fmt.Sprintf("郵便番号の取得に失敗しました。%s", err)
 		log.Printf(errorMsg)
-		response.StatusCode = 500
-		response.Body = errorMsg
-		return response, err
+		return events.APIGatewayProxyResponse{
+			Body:       err.Error(),
+			StatusCode: 500,
+		}, err
 	}
 
 	if area.Zip == "" {
@@ -140,17 +133,18 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (MyResp
 	if err != nil {
 		errorMsg := fmt.Sprintf("JSONのパースに失敗しました。%s", err)
 		log.Printf(errorMsg)
-		response.StatusCode = 500
-		response.Body = errorMsg
-		return response, err
+		return events.APIGatewayProxyResponse{
+			Body:       err.Error(),
+			StatusCode: 500,
+		}, err
 	}
 
 	json.HTMLEscape(&buf, body)
 
-	response.StatusCode = 200
-	response.Body = buf.String()
-
-	return response, nil
+	return events.APIGatewayProxyResponse{
+		Body:       buf.String(),
+		StatusCode: 200,
+	}, nil
 }
 
 func main() {
