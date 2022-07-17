@@ -11,7 +11,7 @@ sam --version
 
 ## ファイル構成
 
-- lambda(lambdaファイル)
+- lambdaSample(lambdaファイル)
     - build.sh ビルド
     - go.mod パッケージ管理
     - go.sum パッケージ記録
@@ -174,3 +174,8 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 DBにログインした後、
 CSV→DBへのインサート
 csv \copy area (zip,pref_kana,city_kana,town_kana,pref,city,town) from '/docker-entrypoint-initdb.d/KEN_ALL.CSV' with csv header
+
+## apiSampleのサンプルは以下を参考に
+
+https://github.com/classmethod/aws-for-everyone/tree/master/chapter03/aws-for-everyone-sls
+
