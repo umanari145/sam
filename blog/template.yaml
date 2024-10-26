@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   blog
@@ -29,11 +29,35 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:
-      - x86_64
+        - x86_64
       Events:
-        Api:
-            Type: Api
-            Properties:
-                Path: /blogs/
-                Method: get
-                RestApiId: !Ref blogApi
+        getBlogs:
+          Type: Api
+          Properties:
+            Path: /blogs  
+            Method: get
+            RestApiId: !Ref blogApi
+        getBlog:
+          Type: Api
+          Properties:
+            Path: /blog/{id}
+            Method: get
+            RestApiId: !Ref blogApi
+        postBlog:
+          Type: Api
+          Properties:
+            Path: /blog
+            Method: post
+            RestApiId: !Ref blogApi
+        putBlog:
+          Type: Api
+          Properties:
+            Path: /blog/{id}
+            Method: put
+            RestApiId: !Ref blogApi
+        deleteBlog:
+          Type: Api
+          Properties:
+            Path: /blog/{id}
+            Method: delete
+            RestApiId: !Ref blogApi
