@@ -39,7 +39,7 @@ lambdaローカル実行
 ```
 sam local invoke LambdaSampleFunction --event event_api.json --debug -l sample.log
 
-#実行結果 dockerのイメージをダウンロードして実行しているようで4〜5秒かかる。初回はもっと。
+#実行結果 dockerのイメージをダウンロードして実行しているようで4〜5分かかる。初回はもっと。
 updating: main (deflated 49%)
 Invoking main (go1.x)
 ・・・・・・・・・・・・・・
