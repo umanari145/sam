@@ -1,11 +1,12 @@
 import os
 import json
-import boto3
-from boto3.dynamodb.conditions import Key
+from pymongo import MongoClient
+from bson import ObjectId
 
-# DynamoDB クライアントを初期化
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.getenv('TABLE_NAME'))
+# DocumentDB クライアントの設定
+client = MongoClient(os.getenv('DOCDB_URI'))
+db = client['blogdb']
+collection = db['blog']
 
 def lambda_handler(event, context):
     method = event['httpMethod']
@@ -25,9 +26,10 @@ def lambda_handler(event, context):
 
 def get_blog(blog_id):
     try:
-        response = table.get_item(Key={'id': blog_id})
-        if 'Item' in response:
-            return respond(200, response['Item'])
+        blog = collection.find_one({"_id": blog_id})
+        if blog:
+            blog['_id'] = str(blog['_id'])
+            return respond(200, blog)
         else:
             return respond(404, {"error": "Blog not found"})
     except Exception as e:
@@ -36,32 +38,30 @@ def get_blog(blog_id):
 def create_blog(event):
     try:
         data = json.loads(event['body'])
-        table.put_item(Item=data)
+        result = collection.insert_one(data)
+        data['_id'] = str(result.inserted_id)
         return respond(201, {"message": "Blog created", "data": data})
-    except (KeyError, json.JSONDecodeError) as e:
-        return respond(400, {"error": "Invalid input", "details": str(e)})
     except Exception as e:
         return respond(500, {"error": str(e)})
 
 def update_blog(blog_id, event):
     try:
         data = json.loads(event['body'])
-        table.update_item(
-            Key={'id': blog_id},
-            UpdateExpression="SET title = :title, content = :content",
-            ExpressionAttributeValues={
-                ':title': data['title'],
-                ':content': data['content']
-            },
-            ReturnValues="ALL_NEW"
+        result = collection.update_one(
+            {"_id": blog_id},
+            {"$set": data}
         )
-        return respond(200, {"message": "Blog updated", "data": data})
+        if result.matched_count == 0:
+            return respond(404, {"error": "Blog not found"})
+        return respond(200, {"message": "Blog updated"})
     except Exception as e:
         return respond(500, {"error": str(e)})
 
 def delete_blog(blog_id):
     try:
-        response = table.delete_item(Key={'id': blog_id})
+        result = collection.delete_one({"_id": blog_id})
+        if result.deleted_count == 0:
+            return respond(404, {"error": "Blog not found"})
         return respond(200, {"message": "Blog deleted"})
     except Exception as e:
         return respond(500, {"error": str(e)})
